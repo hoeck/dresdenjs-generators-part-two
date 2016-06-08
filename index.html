@@ -1,0 +1,318 @@
+<!doctype html>
+<html lang="en">
+
+    <head>
+	<meta charset="utf-8">
+
+	<title>reveal.js – The HTML Presentation Framework</title>
+
+	<meta name="description" content="ES6 Generators">
+	<meta name="author" content="Erik Söhnel">
+
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+
+        <link rel="stylesheet" href="/node_modules/font-awesome/css/font-awesome.min.css">
+
+	<link rel="stylesheet" href="/node_modules/reveal.js/css/reveal.css">
+	<link rel="stylesheet" href="/node_modules/reveal.js/css/theme/beige.css" id="theme">
+
+	<!-- Code syntax highlighting -->
+	<link rel="stylesheet" href="/node_modules/highlightjs/styles/github.css">
+
+        <style>
+            em {
+                color: #42affa;
+            }
+
+            /* highlightjs */
+            .hljs-params {
+              color: #88B;
+            }
+
+            /* undo normalize of revealjs theme for github highlightjs theme */
+            .reveal pre code span.hljs-keyword {
+              font-weight: bold;
+            }
+
+            /* links */
+            a:before {
+              display: inline-block;
+              font: normal normal normal 14px/1 FontAwesome;
+              font-size: 25px;
+              text-rendering: auto;
+              padding: 5px;
+              content: "\f08e";
+            }
+
+            /* reveal-code-focus */
+            .line {
+              display: block;
+              transition-duration: 0.2s;
+              transition-property: background-color;
+            }
+            .line.focus {
+              background: yellow;
+            }
+
+            .reveal .slides section .fragment {
+              transition-duration: 2s; important!
+              transition-property: display; important!
+            }
+
+            .reveal .slides section .fragment.current-visible {
+              opacity: 1;
+              visibility: visible;
+              display: none;
+            }
+
+            .reveal .slides section .fragment.current-visible.current-fragment {
+              display: block;
+            }
+        </style>
+
+	<!-- Printing and PDF exports -->
+	<script>
+	    var link = document.createElement( 'link' );
+	    link.rel = 'stylesheet';
+	    link.type = 'text/css';
+	    link.href = window.location.search.match( /print-pdf/gi ) ? '/node_modules/reveal.js/css/print/pdf.css' : '/node_modules/reveal.js/css/print/paper.css';
+	    document.getElementsByTagName( 'head' )[0].appendChild( link );
+	</script>
+    </head>
+
+    <body>
+
+	<div class="reveal">
+
+	    <!-- Any section element inside of this container is displayed as a slide -->
+	    <div class="slides">
+		<section>
+                    <h2>ES6 generators</h2>
+                    <h6>and</h6>
+                    <h3>Asynchronous Computations</h2>
+
+                    <div>Erik Soehnel</div>
+
+                    <div>github.com/hoeck</div>
+		</section>
+
+                <section data-markdown><script type="text/template">
+                    ### Agenda
+
+                    1. Recap: ES6 Generator Syntax
+                    2. Async: No Callbacks, No Promises
+                    3. Drawbacks & Outlook
+                </script></section>
+
+                <section data-markdown><script type="text/template">
+                    ### Recap: ES6 Generator Syntax
+                </script></section>
+
+                <section data-markdown><script type="text/template">
+                    <h3 style="display:inline">ES6 Generator Syntax</h3> ([codepen](https://codepen.io/shnel/pen/pbJQaV/?editors=0010))
+
+                    ```javascript
+                    function* range (start, end) {
+                        while (start < end) {
+                            yield start++;
+                        }
+                    }
+
+                    const gen = range(5, 7);
+
+                    gen.next() // => {value: 5, done: false}
+                    gen.next() // => {value: 6, done: false}
+                    gen.next() // => {done: true}
+                    ```
+                    <span class="fragment current-visible" data-code-focus="1">_`function*`_ defines a *generator function*</span>
+                    <span class="fragment current-visible" data-code-focus="3">_`yield`_ produces the generators *values*</span>
+                    <span class="fragment current-visible" data-code-focus="7">calling it creates a generator instance</span>
+                    <span class="fragment current-visible" data-code-focus="9">`next()` delivers the generators values</span>
+                    <span class="fragment current-visible" data-code-focus="10">`next()` delivers the generators values</span>
+                    <span class="fragment current-visible" data-code-focus="11">until there are no more values</span>
+                </script></section>
+
+                <section data-markdown><script type="text/template">
+                    ### ES6 Generator Syntax
+
+                    - available since Node 4
+                    - on current Firefox, Chrome, Edge
+                    - always via babel & polyfill
+                    - check the [ES6 compat table](https://kangax.github.io/compat-table/es6/#test-generators)
+                </script></section>
+
+                <section data-markdown><script type="text/template">
+                    ### No Callbacks, No Promises
+                </script></section>
+
+                <section data-markdown><script type="text/template">
+                    ### Asynchronus Code
+
+                    - what is JS good at? Asynchronous Code!
+                    - what plagues JS? Callbacks!
+                    - promises are supposed to help ..
+                </script></section>
+
+                <section data-markdown><script type="text/template">
+                    ### Asynchronus Code
+
+                    Example: web application handler, synchronous version
+
+                    ```javscript
+                    function handler (sessionid, response):
+                        const session = loadSessionSync(sessionid);
+                        const user = loadUserSync(session.userId);
+
+                        response.send(`Hello ${user.name}`);
+                    ```
+                    <span class="fragment current-visible" data-code-focus="2">load a session from the db and *wait*</span>
+                    <span class="fragment current-visible" data-code-focus="3">load a user from the db and *wait*</span>
+                    <span class="fragment current-visible" data-code-focus="5">create the response</span>
+                </script></section>
+
+                <section data-markdown><script type="text/template">
+                    ### web app handler with callbacks
+
+                    ```javascript
+                    function handler (sessionid, response) {
+                        loadSession(sessionid, function (err, session) {
+                            if (err) response.status(500).send();
+                            loadUser(session.userId, function (err, user) {
+                                if (err) response.status(500).send();
+                                response.send(`hello ${user.name}`);
+                            })
+                        });
+                    };
+                    ```
+                    <span class="fragment current-visible" data-code-focus="2">load a session from the db, when done, invoke a callback</span>
+                    <span class="fragment current-visible" data-code-focus="4">load a user from the db, when done, invoke a callback</span>
+                    <span class="fragment current-visible" data-code-focus="6">create and send the response</span>
+                    <span class="fragment current-visible" data-code-focus="3,5">deal with errors in each callback</span>
+                </script></section>
+
+                <section data-markdown><script type="text/template">
+                    ### callbacks
+
+                    ```javascript
+                    loadUser(userId, function (err, user) {
+                        response.send(`hello ${user.name}`);
+                    }
+                    ```
+
+                    - most naive approach to asynchronous code
+                    - *continuation passing style* [c2wiki](http://c2.com/cgi/wiki?ContinuationPassingStyle)
+                    - hard to follow
+                    - christmas tree code
+                    - ...
+                </script></section>
+
+                <section data-markdown><script type="text/template">
+                    ### promises
+
+                    ```javascript
+                    function handler (sessionid, response) {
+                        loadSession(sessionid).then(function (session) {
+                            return loadUser(session.userId);
+                        }).then(function (user) {
+                            response.send(`hello ${user.name}`);
+                        }).catch(function (err) {
+                            response.status(500).send();
+                        });
+                    };
+                    ```
+                    <span class="fragment current-visible" data-code-focus="2">load a session from the db, when done, return a promise</span>
+                    <span class="fragment current-visible" data-code-focus="3">load a user from the db, when done, return a promoise</span>
+                    <span class="fragment current-visible" data-code-focus="5">create and send the response</span>
+                    <span class="fragment current-visible" data-code-focus="7">error handling for the promise chain</span>
+                </script></section>
+
+                <section data-markdown><script type="text/template">
+                    ### promises
+
+                    ```javascript
+                    loadSession(sessionid).then(function (session) {
+                        return loadUser(session.userId);
+                    })
+                    ```
+
+                    - not easy to read and follow
+                    - provide some level of composability
+                    - better error handling with *`.catch`*
+                    - they're an important building block
+                </script></section>
+
+                <section data-markdown><script type="text/template">
+                    ### with generators
+
+                    ```javascript
+                    function * handler (sessionid, response) {
+                        const session = yield loadSession(request.sessionId);
+                        const user = yield loadUser(session.userId);
+
+                        response.send(`hello ${user.name}`);
+                    }
+                    ```
+                    <span class="fragment current-visible" data-code-focus="2">load a session from the db, when done, keep it in *`session`* </span>
+                    <span class="fragment current-visible" data-code-focus="3">load a user from the db, when done, keep it in *`user`*</span>
+                    <span class="fragment current-visible" data-code-focus="5">create and send the response</span>
+                    <span class="fragment current-visible" data-code-focus="1,6">errors are *`throw`*n and can be catched (e.g. by the framework)</span>
+                </script></section>
+
+                <section data-markdown><script type="text/template">
+                    ### with generators
+
+                    synchronous
+                    ```javascript
+                    function handler (sessionid, response) {
+                        const session = loadSessionSync(sessionid);
+                        const user = loadUserSync(session.userId);
+
+                        response.send(`Hello ${user.name}`);
+                    }
+                    ```
+
+                    asynchronous
+                    ```javascript
+                    function * handler (sessionid, response) {
+                        const session = yield loadSession(request.sessionId);
+                        const user = yield loadUser(session.userId);
+
+                        response.send(`hello ${user.name}`);
+                    }
+                    ```
+                </script></section>
+            </div>
+        </div>
+
+	<script src="/node_modules/reveal.js/lib/js/head.min.js"></script>
+	<script src="/node_modules/reveal.js/js/reveal.js"></script>
+
+	<script>
+
+	    // Full list of configuration options available at:
+	    // https://github.com/hakimel/reveal.js#configuration
+	    Reveal.initialize({
+	    controls: false,
+	    progress: false,
+	    history: true,
+	    center: true,
+
+	    transition: 'slide', // none/fade/slide/convex/concave/zoom
+
+	    // Optional reveal.js plugins
+	    dependencies: [
+
+	      { src: '/node_modules/reveal.js/lib/js/classList.js', condition: function() { return !document.body.classList; } },
+	      { src: '/node_modules/reveal.js/plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+	      { src: '/node_modules/reveal.js/plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+	      { src: '/node_modules/reveal.js/plugin/zoom-js/zoom.js', async: true },
+	      { src: '/node_modules/reveal.js/plugin/notes/notes.js', async: true },
+
+	      { src: '/node_modules/highlightjs/highlight.pack.js' },
+              { src: '/node_modules/reveal-code-focus/reveal-code-focus.js', async: true, callback: function() { RevealCodeFocus(); }}
+	    ]
+	    });
+
+	</script>
+    </body>
+</html>
