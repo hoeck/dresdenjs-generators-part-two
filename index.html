@@ -68,7 +68,68 @@
             .reveal .slides section .fragment.current-visible.current-fragment {
               display: block;
             }
+
         </style>
+
+<style>
+/* taken from http://codepen.io/halvves/pen/XKmPer */
+.wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.wrap .div1, .wrap .div2 {
+  height: 30vw;
+  width: 30vw;
+  position: relative;
+  display: flex;
+  justify-content:center;
+  align-content:center;
+  flex-direction:column;
+  font-weight: bold;
+}
+
+.div1 {
+  mix-blend-mode: difference;
+  content: '';
+  absolute;
+  height: 30vw;
+  width: 30vw;
+  background-color: rgba(0,255,255,0.6);
+  border-radius: 50%;
+  animation: dance-a 1.8s ease-in-out infinite alternate;
+}
+.div2 {
+  mix-blend-mode: difference;
+  content: '';
+  position: absolute;
+  height: 30vw;
+  width: 30vw;
+  background-color: rgba(255,0,0,0.6);
+  border-radius: 50%;
+  animation: dance-b 1.8s ease-in-out infinite alternate;
+}
+
+@keyframes dance-a {
+  0% {
+    left: 35vw;
+  }
+  100% {
+    left: -5vw;
+  }
+}
+
+@keyframes dance-b {
+  0% {
+    left: -35vw;
+  }
+  100% {
+    left: 5vw;
+  }
+}
+</style>
 
 	<!-- Printing and PDF exports -->
 	<script>
@@ -89,7 +150,7 @@
 		<section>
                     <h2>ES6 generators</h2>
                     <h6>and</h6>
-                    <h3>Asynchronous Computations</h2>
+                    <h3>Non-Blocking Computations</h2>
 
                     <div>Erik Soehnel</div>
 
@@ -100,8 +161,8 @@
                     ### Agenda
 
                     1. Recap: ES6 Generator Syntax
-                    2. Async: No Callbacks, No Promises
-                    3. Drawbacks & Outlook
+                    2. Non Blocking: No Callbacks, No Promises
+                    3. Summary, Future
                 </script></section>
 
                 <section data-markdown><script type="text/template">
@@ -146,15 +207,15 @@
                 </script></section>
 
                 <section data-markdown><script type="text/template">
-                    ### Asynchronus Code
+                    ### Non-Blocking Code
 
-                    - what is JS good at? Asynchronous Code!
+                    - what is JS good at? non-blocking (Asynchronus) Code!
                     - what plagues JS? Callbacks!
                     - promises are supposed to help ..
                 </script></section>
 
                 <section data-markdown><script type="text/template">
-                    ### Asynchronus Code
+                    ### Non-Blocking Code
 
                     Example: web application handler, synchronous version
 
@@ -199,7 +260,7 @@
                     }
                     ```
 
-                    - most naive approach to asynchronous code
+                    - most naive approach to Non-Blocking code
                     - *continuation passing style* [c2wiki](http://c2.com/cgi/wiki?ContinuationPassingStyle)
                     - hard to follow
                     - christmas tree code
@@ -246,7 +307,7 @@
 
                     ```javascript
                     function * handler (sessionid, response) {
-                        const session = yield loadSession(request.sessionId);
+                        const session = yield loadSession(sessionId);
                         const user = yield loadUser(session.userId);
 
                         response.send(`hello ${user.name}`);
@@ -261,25 +322,135 @@
                 <section data-markdown><script type="text/template">
                     ### with generators
 
-                    synchronous
                     ```javascript
+                    // blocking
                     function handler (sessionid, response) {
                         const session = loadSessionSync(sessionid);
                         const user = loadUserSync(session.userId);
 
                         response.send(`Hello ${user.name}`);
                     }
-                    ```
 
-                    asynchronous
-                    ```javascript
+                    // non-blocking
                     function * handler (sessionid, response) {
-                        const session = yield loadSession(request.sessionId);
+                        const session = yield loadSession(sessionId);
                         const user = yield loadUser(session.userId);
 
                         response.send(`hello ${user.name}`);
                     }
                     ```
+                    <span class="fragment current-visible" data-code-focus="3,11">the same, except *`yield`*</span>
+                    <span class="fragment current-visible" data-code-focus="4,12">the same, except *`yield`*</span>
+                    <div class="fragment current-visible" data-code-focus="3,4,5,13,11,12,6,14">
+                        <h2>*the non blocking version is the same as the blocking one*</h2>
+                    </div>
+                </script></section>
+
+                <section data-markdown><script type="text/template">
+                    ### Generators are an
+                    <div class="wrap">
+                        <div class="div1">Awesome</div>
+                        <div class="div2">Abstraction</div>
+                    </div>
+                </script></section>
+
+                <section data-markdown><script type="text/template">
+                    ### Non-Blocking Code
+
+                    with *generators*
+                    - looks similar to synchronous code
+                    - error handling via exceptions
+                    - interoperates well with promises
+                </script></section>
+
+                <section data-markdown><script type="text/template">
+                    ### Promise Interactions
+
+                    to actually write non-blocking generator code
+
+                    - web framework: [koa](http://koajs.com/)
+                    - library: [co](https://github.com/tj/co)
+                    - promises for nodejs APIs [mz](https://github.com/normalize/mz)
+                </script></section>
+
+                <section data-markdown><script type="text/template">
+                    ### co example
+
+                    downloading files
+                    ```javascript
+                    import co from co;
+                    import fs from 'mz/fs';
+                    import request from 'request-promise';
+
+                    const loadFiles = co.wrap(function* (targets) {
+                        for (target of targets) {
+                            const data = yield request.get(target.url);
+                            yield fs.writeFile(target.name, data);
+                        }
+                    });
+
+                    loadFiles(files).then(() => {
+                        console.log('done');
+                    }).catch((err) => {
+                        console.log(err.stack);
+                    });
+                    ```
+                    <span class="fragment current-visible" data-code-focus="1">*`co`*: transforms a generator into a promise</span>
+                    <span class="fragment current-visible" data-code-focus="2">*`mz/fs`*: nodejs filesystem module using promises</span>
+                    <span class="fragment current-visible" data-code-focus="3">*`request-promise`*: http client using promises</span>
+
+                    <span class="fragment current-visible" data-code-focus="5-10">the *generator*</span>
+                    <span class="fragment current-visible" data-code-focus="5">*`co.wrap`* turns a generator into a Promise</span>
+                    <span class="fragment current-visible" data-code-focus="6">loop through all targets</span>
+                    <span class="fragment current-visible" data-code-focus="7">*`request.get(target.url)`* fetches an url and returns a Promise</span>
+                    <span class="fragment current-visible" data-code-focus="7">*`yield`* takes the promise and passes execution to `co`</span>
+                    <span class="fragment current-visible" data-code-focus="7">*`const data`*: once the promise is resolved, co consumes the generator</span>
+                    <span class="fragment current-visible" data-code-focus="8">*`fs.writeFile`* writes data to a file, when done, the loop continues</span>
+
+                    <span class="fragment current-visible" data-code-focus="12-16">calling *`loadFiles`* returns a promise</span>
+                </script></section>
+
+                <section data-markdown><script type="text/template">
+                    ### and the future
+
+                    ES7 *`async`* & *`await`*
+                    ```javascript
+                    function * handler (sessionid, response) {
+                        const session = yield loadSession(sessionId);
+                        const user = yield loadUser(session.userId);
+
+                        response.send(`hello ${user.name}`);
+                    }
+                    const promise = co.wrap(handler)(sessionid, response);
+
+                    // turns into
+                    async function handler () {
+                        const session = await loadSession(sessionId);
+                        const user = await loadUser(session.userId);
+
+                        response.send(`hello ${user.name}`);
+                    }
+                    const promise = handler(sessionid, response);
+                    ```
+                    <span class="fragment current-visible" data-code-focus="1,10">`function` _`*`_ <i class="fa fa-arrow-right" aria-hidden="true"></i> _`async`_ `function`</span>
+                    <span class="fragment current-visible" data-code-focus="2-3,11-12">*`yield`* <i class="fa fa-arrow-right" aria-hidden="true"></i> *`await`*</span>
+                    <span class="fragment current-visible" data-code-focus="7,16">and you don't need *`co`*</span>
+                </script></section>
+
+                <section data-markdown><script type="text/template">
+                    ### summing up
+
+                    - generators let you trivially write non-blocking code
+                    - they're supported by babel and nodejs
+                    - there is framework and library support
+                    - you can start using them *today*
+                    - in the future you will use *`async`* & *`await`*
+                </script></section>
+
+                <section data-markdown><script type="text/template">
+                    # summing up
+
+                    ([codepen.io/shnel/pen/VjeKwL](https://codepen.io/shnel/pen/VjeKwL/?editors=0010))
                 </script></section>
             </div>
         </div>
