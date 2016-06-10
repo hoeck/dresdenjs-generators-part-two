@@ -19,6 +19,8 @@
 	<!-- Code syntax highlighting -->
 	<link rel="stylesheet" href="/node_modules/highlightjs/styles/github.css">
 
+	<link rel="stylesheet" href="/node_modules/animate.css/animate.css">
+
         <style>
             em {
                 color: #42affa;
@@ -147,7 +149,7 @@
 
 	    <!-- Any section element inside of this container is displayed as a slide -->
 	    <div class="slides">
-		<section>
+		<section id="section1">
                     <h2>ES6 generators</h2>
                     <h6>and</h6>
                     <h3>Non-Blocking Computations</h2>
@@ -156,6 +158,39 @@
 
                     <div>github.com/hoeck</div>
 		</section>
+
+<script type="text/javascript">
+    function animateRandom (x) {
+      if (x) {
+          Array.prototype.slice.call(document.querySelectorAll('#section1 > *')).forEach(function (el) {
+              el.className = '';
+          });
+          setTimeout(animateRandom.bind(null, false), 2000);
+      } else {
+          var classes = ['bounce',
+                         'flash',
+                         'pulse',
+                         'rubberBand',
+                         'shake',
+                         'headShake',
+                         'swing',
+                         'tada',
+                         'wobble',
+                         'jello'];
+          var randClass = classes[Math.floor(Math.random() * classes.length)];
+
+          var elements = Array.prototype.slice.call(document.querySelectorAll('#section1 > *'));
+
+          var randElement = elements[Math.floor(Math.random() * elements.length)];
+
+          randElement.className = 'animated ' + randClass;
+
+          setTimeout(animateRandom.bind(null, true), 2000 + Math.random()*2000);
+      }
+    }
+
+    setTimeout(animateRandom, 3000);
+</script>
 
                 <section data-markdown><script type="text/template">
                     ### Agenda
@@ -448,9 +483,11 @@
                 </script></section>
 
                 <section data-markdown><script type="text/template">
-                    # summing up
+                    ### summing up
 
-                    ([codepen.io/shnel/pen/VjeKwL](https://codepen.io/shnel/pen/VjeKwL/?editors=0010))
+                    [codepen.io/shnel/pen/VjeKwL](https://codepen.io/shnel/pen/VjeKwL/?editors=0010)
+
+                    # Thanks
                 </script></section>
             </div>
         </div>

@@ -9,10 +9,11 @@
   "author": "Erik Söhnel",
   "license": "UNLICENSED",
   "dependencies": {
+    "animate.css": "^3.5.1",
+    "font-awesome": "^4.6.3",
     "highlightjs": "^8.7.0",
     "http-server": "^0.9.0",
     "reveal-code-focus": "^0.2.0",
-    "reveal.js": "^3.3.0",
-    "font-awesome": "^4.6.3"
+    "reveal.js": "^3.3.0"
   }
 }
