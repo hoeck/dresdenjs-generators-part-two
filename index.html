@@ -4,22 +4,22 @@
     <head>
 	<meta charset="utf-8">
 
-	<title>reveal.js – The HTML Presentation Framework</title>
+	<title>ES6 Generators And Non-Blocking Computations</title>
 
 	<meta name="description" content="ES6 Generators">
 	<meta name="author" content="Erik Söhnel">
 
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
 
-        <link rel="stylesheet" href="/node_modules/font-awesome/css/font-awesome.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css">
 
-	<link rel="stylesheet" href="/node_modules/reveal.js/css/reveal.css">
-	<link rel="stylesheet" href="/node_modules/reveal.js/css/theme/beige.css" id="theme">
+	<link rel="stylesheet" href="node_modules/reveal.js/css/reveal.css">
+	<link rel="stylesheet" href="node_modules/reveal.js/css/theme/beige.css" id="theme">
 
 	<!-- Code syntax highlighting -->
-	<link rel="stylesheet" href="/node_modules/highlightjs/styles/github.css">
+	<link rel="stylesheet" href="node_modules/highlightjs/styles/github.css">
 
-	<link rel="stylesheet" href="/node_modules/animate.css/animate.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.5.2/animate.min.css">
 
         <style>
             em {
@@ -138,7 +138,7 @@
 	    var link = document.createElement( 'link' );
 	    link.rel = 'stylesheet';
 	    link.type = 'text/css';
-	    link.href = window.location.search.match( /print-pdf/gi ) ? '/node_modules/reveal.js/css/print/pdf.css' : '/node_modules/reveal.js/css/print/paper.css';
+	    link.href = window.location.search.match( /print-pdf/gi ) ? 'node_modules/reveal.js/css/print/pdf.css' : 'node_modules/reveal.js/css/print/paper.css';
 	    document.getElementsByTagName( 'head' )[0].appendChild( link );
 	</script>
     </head>
@@ -492,8 +492,8 @@
             </div>
         </div>
 
-	<script src="/node_modules/reveal.js/lib/js/head.min.js"></script>
-	<script src="/node_modules/reveal.js/js/reveal.js"></script>
+	<script src="node_modules/reveal.js/lib/js/head.min.js"></script>
+	<script src="node_modules/reveal.js/js/reveal.js"></script>
 
 	<script>
 
@@ -510,14 +510,14 @@
 	    // Optional reveal.js plugins
 	    dependencies: [
 
-	      { src: '/node_modules/reveal.js/lib/js/classList.js', condition: function() { return !document.body.classList; } },
-	      { src: '/node_modules/reveal.js/plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
-	      { src: '/node_modules/reveal.js/plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
-	      { src: '/node_modules/reveal.js/plugin/zoom-js/zoom.js', async: true },
-	      { src: '/node_modules/reveal.js/plugin/notes/notes.js', async: true },
+	      { src: 'node_modules/reveal.js/lib/js/classList.js', condition: function() { return !document.body.classList; } },
+	      { src: 'node_modules/reveal.js/plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+	      { src: 'node_modules/reveal.js/plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+	      { src: 'node_modules/reveal.js/plugin/zoom-js/zoom.js', async: true },
+	      { src: 'node_modules/reveal.js/plugin/notes/notes.js', async: true },
 
-	      { src: '/node_modules/highlightjs/highlight.pack.js' },
-              { src: '/node_modules/reveal-code-focus/reveal-code-focus.js', async: true, callback: function() { RevealCodeFocus(); }}
+	      { src: 'node_modules/highlightjs/highlight.pack.min.js' },
+              { src: 'node_modules/reveal-code-focus/reveal-code-focus.js', async: true, callback: function() { RevealCodeFocus(); }}
 	    ]
 	    });
 
